@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site Under Maintenance</title>
+  <style>
+    :root {
+      --bg-color: #000;
+      --text-color: #fff;
+      --secondary-text: #aaa;
+    }
+    [data-theme="light"] {
+      --bg-color: #fff;
+      --text-color: #000;
+      --secondary-text: #555;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--secondary-text);
+      max-width: 400px;
+      width: 100%;
+    }
+    .icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--secondary-text);
+      margin-bottom: 20px;
+    }
+    .timer {
+      font-size: 32px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 8px 16px;
+      border: none;
+      background-color: var(--secondary-text);
+      color: var(--bg-color);
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">🔧</div>
+    <div class="title">Site Under Maintenance</div>
+    <div class="subtitle">We're making some improvements and will be back online shortly. Thanks for your patience!</div>
+    <div class="timer" id="countdown">03:00:00</div>
+    <button id="themeToggle">Toggle Theme</button>
+  </div>
+
+  <script>
+    // Helper to parse URL parameters
+    function getUrlParam(key) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(key);
+    }
+
+    // Default values
+    const defaultStartTime = "2025-08-15T19:10:00Z";
+    const defaultDuration = 3 * 3600; // 3 hours in seconds
+
+    // Get parameters
+    const paramTime = getUrlParam('timefrom');
+    const paramDuration = getUrlParam('duration');
+
+    // Parse start time
+    let startTime;
+    if (paramTime) {
+      // Remove quotes if present
+      const cleanTime = paramTime.replace(/(^"|"$)/g, "");
+      const parsedTime = new Date(cleanTime);
+      if (isNaN(parsedTime)) {
+        startTime = new Date(defaultStartTime);
+      } else {
+        startTime = parsedTime;
+      }
+    } else {
+      startTime = new Date(defaultStartTime);
+    }
+
+    // Parse duration
+    let durationSeconds;
+    if (paramDuration && !isNaN(Number(paramDuration)) && Number(paramDuration) > 0) {
+      durationSeconds = Number(paramDuration);
+    } else {
+      durationSeconds = defaultDuration;
+    }
+
+    // Calculate end time
+    const endTime = new Date(startTime.getTime() + durationSeconds * 1000);
+
+    const countdownElement = document.getElementById('countdown');
+
+    function updateCountdown() {
+      const now = new Date(new Date().toUTCString());
+      let timeInSeconds = Math.floor((endTime - now) / 1000);
+      if (timeInSeconds < 0) timeInSeconds = 0;
+
+      let hours = Math.floor(timeInSeconds / 3600);
+      let minutes = Math.floor((timeInSeconds % 3600) / 60);
+      let seconds = timeInSeconds % 60;
+
+      countdownElement.textContent =
+        String(hours).padStart(2, '0') + ':' +
+        String(minutes).padStart(2, '0') + ':' +
+        String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+    });
+
+    // Default theme
+    document.body.dataset.theme = 'dark';
+  </script>
+</body>
+</html>
